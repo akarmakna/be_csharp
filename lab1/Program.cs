@@ -1,12 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 using lab1.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// CORS
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:51945") 
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
+// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoList"));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -20,6 +33,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// **Tambahkan ini sebelum UseAuthorization()**
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
